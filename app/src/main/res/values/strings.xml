@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">VideoStreamer</string>
+    <string name="app_name">Video Streamer</string>
+    <string name="logo">Logo</string>
+    <string name="video_thumbnail">Video Thumbnail</string>
 </resources>

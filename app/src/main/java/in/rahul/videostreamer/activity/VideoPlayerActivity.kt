@@ -19,6 +19,8 @@ import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_video_player.*
 import java.util.ArrayList
 
@@ -32,6 +34,8 @@ class VideoPlayerActivity : AppCompatActivity() {
     private var videoUrl: String? = ""
     private var videoTitle: String? = ""
     private var videoDes: String? = ""
+    private var videoId: String? = ""
+    private var userUid: String? = ""
     lateinit var nextVideoList: ArrayList<VideoListModel>
 //    private var playbackStateListener:PlaybackStateListener? = null
 
@@ -40,17 +44,38 @@ class VideoPlayerActivity : AppCompatActivity() {
         setContentView(R.layout.activity_video_player)
 
         playerView = findViewById(R.id.exo_player)
+        userUid = FirebaseAuth.getInstance().currentUser?.uid
         videoTitle = intent.getStringExtra("title")
         videoDes = intent.getStringExtra("description")
         videoUrl = intent.getStringExtra("vedioUrl")
-        val id = intent.getStringExtra("id")
+        videoId = intent.getStringExtra("id")
         nextVideoList = intent.getParcelableArrayListExtra<VideoListModel>("videoList")!!
 
-//        if (nextVideoList != null){
-//            for (i in nextVideoList.indices){
-//                Log.e("vp Act", ": ${nextVideoList.get(i).url}")
-//            }
-//        }
+        val videoRef = FirebaseDatabase.getInstance().getReference("videoData/$userUid/$videoId")
+        videoRef.addValueEventListener(object : ValueEventListener{
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+            override fun onDataChange(data: DataSnapshot) {
+                val stData = "playWhen: ${data.child("playWhenReady").getValue()}, pos: ${data.child("playbackPosition").getValue()}, win: ${data.child("currentWindow").getValue()}"
+                Log.e("vid play data", stData)
+                val videoPlayReady = "${data.child("playWhenReady").getValue()}"
+                val videoPosition = "${data.child("playbackPosition").getValue()}"
+                val videoWindow = "${data.child("currentWindow").getValue()}"
+                if (!videoPlayReady.equals("null")){
+                    playWhenReady = videoPlayReady.toBoolean()
+                }
+                if (!videoPosition.equals("null")){
+                    playbackPosition = videoPosition.toLong()
+                }
+                if (!videoWindow.equals("null")){
+                    currentWindow = videoWindow.toInt()
+                }
+                initializePlayer()
+            }
+
+        })
 
         tv_title.text = videoTitle
         tv_description.text = videoDes
@@ -135,9 +160,15 @@ class VideoPlayerActivity : AppCompatActivity() {
 
             Log.e("ExoAct2", stLog)
 
-//            SharedPrefranceUtil(this).setPlayWhenReadyPref(player!!.playWhenReady)
-//            SharedPrefranceUtil(this).setPlaybackPositionPref(player!!.currentPosition)
-//            SharedPrefranceUtil(this).setCurrentWindowPref(player!!.currentWindowIndex)
+//            DatabaseReference checkOnline = FirebaseDatabase.getInstance().getReference("status");
+            val videoDataReference = FirebaseDatabase.getInstance().getReference("videoData")
+
+            val map = HashMap<String, String>()
+            map.put("playWhenReady", playWhenReady.toString())
+            map.put("playbackPosition", playbackPosition.toString())
+            map.put("currentWindow", currentWindow.toString())
+
+            videoDataReference.child(userUid!!).child(videoId!!).setValue(map)
 //
 //            player!!.removeListener(playbackStateListener)
             player!!.release()

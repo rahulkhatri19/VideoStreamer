@@ -1,7 +1,7 @@
-Video Streamer : App to Stream vedios
+Video Streamer : App to Stream videos
 -----
 
-In this application variety of videos available, once user pause or left vedio there, then after he/she came back that video will play from where they left.
+In this application variety of videos available, once user pause or left video there, then after he/she came back that video will play from where they left.
 
 
 ### App Specifications: 
@@ -14,7 +14,9 @@ In this application variety of videos available, once user pause or left vedio t
 - [Retrofit2](https://github.com/square/retrofit) : In Vedio all activity retrofit2 is used as networking library.
 - [Shimmer Facebook library](https://github.com/facebook/shimmer-android): SHowing progress like layout.
 
- <!-- - [Release apk]() -->
+### Apk
+
+- [Release apk](APK/VideoStreamer.apk) 
 
 Screenshot
 =====
@@ -28,7 +30,7 @@ Screenshot
       <img src="screenshot/login_screen.png" width=250 />
     </td>
     <td>
-      <img src="screenshot/vedio_all_screen.png" width=250 />
+      <img src="screenshot/video_all_screen.png" width=250 />
     </td>
   </tr>
 </table>
@@ -36,7 +38,7 @@ Screenshot
 <table>
   <tr>
     <td>
-      <img src="screenshot/vedio_player_screen.png" width=250 />
+      <img src="screenshot/video_player_screen.png" width=250 />
     </td>
     </tr>
 </table>

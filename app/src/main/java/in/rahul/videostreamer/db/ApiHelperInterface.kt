@@ -1,4 +1,4 @@
-package `in`.rahul.videostreamer.utils
+package `in`.rahul.videostreamer.db
 
 import `in`.rahul.videostreamer.model.VideoModel
 import retrofit2.Call

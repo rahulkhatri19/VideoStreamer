@@ -12,11 +12,11 @@
         android:usesCleartextTraffic="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.VideoPlayerActivity"
+        <activity android:name="in.rahul.videostreamer.view.activity.VideoPlayerActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".activity.VideoAllActivity" />
-        <activity android:name=".activity.LoginActivity" />
-        <activity android:name=".activity.SplashActivity"
+        <activity android:name="in.rahul.videostreamer.view.activity.VideoAllActivity" />
+        <activity android:name="in.rahul.videostreamer.view.activity.LoginActivity" />
+        <activity android:name="in.rahul.videostreamer.view.activity.SplashActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,7 +24,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity">
+        <activity android:name=".view.activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>

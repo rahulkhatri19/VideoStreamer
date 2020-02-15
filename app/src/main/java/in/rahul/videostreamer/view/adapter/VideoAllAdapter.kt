@@ -1,7 +1,7 @@
-package `in`.rahul.videostreamer.adapter
+package `in`.rahul.videostreamer.view.adapter
 
 import `in`.rahul.videostreamer.R
-import `in`.rahul.videostreamer.activity.VideoPlayerActivity
+import `in`.rahul.videostreamer.view.activity.VideoPlayerActivity
 import `in`.rahul.videostreamer.model.VideoListModel
 import `in`.rahul.videostreamer.model.VideoModel
 import android.content.Context

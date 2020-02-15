@@ -1,5 +1,6 @@
-package `in`.rahul.videostreamer
+package `in`.rahul.videostreamer.view.activity
 
+import `in`.rahul.videostreamer.R
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 

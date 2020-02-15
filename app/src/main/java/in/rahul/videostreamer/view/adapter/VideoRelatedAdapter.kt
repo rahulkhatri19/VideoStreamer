@@ -1,4 +1,4 @@
-package `in`.rahul.videostreamer.adapter
+package `in`.rahul.videostreamer.view.adapter
 
 import `in`.rahul.videostreamer.R
 import `in`.rahul.videostreamer.model.VideoListModel

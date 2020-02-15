@@ -1,12 +1,12 @@
-package `in`.rahul.videostreamer.activity
+package `in`.rahul.videostreamer.view.activity
 
 import `in`.rahul.videostreamer.R
-import `in`.rahul.videostreamer.adapter.VideoAllAdapter
+import `in`.rahul.videostreamer.view.adapter.VideoAllAdapter
 import `in`.rahul.videostreamer.model.VideoModel
-import `in`.rahul.videostreamer.utils.ApiHelperInterface
+import `in`.rahul.videostreamer.presenter.VideoAllActivityPresenter
+import `in`.rahul.videostreamer.db.ApiHelperInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -18,21 +18,21 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class VideoAllActivity : AppCompatActivity() {
+class VideoAllActivity : AppCompatActivity(), VideoAllActivityPresenter {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video_all)
-        recycleView.visibility = View.GONE
-        shimmer_layout.visibility = View.VISIBLE
-        shimmer_layout.startShimmer()
+
+        showProgressLayout()
         getVideoData()
+
     }
 
-    private fun getVideoData() {
+    override fun getVideoData() {
         ApiHelperInterface.create().videoData().enqueue(object : Callback<ArrayList<VideoModel>> {
             override fun onFailure(call: Call<ArrayList<VideoModel>>, t: Throwable) {
-                Log.e("VedioAll", ": ${t.stackTrace}")
+                showMessage("Please Try after some time")
             }
 
             override fun onResponse(
@@ -43,9 +43,7 @@ class VideoAllActivity : AppCompatActivity() {
                 recycleView.layoutManager =
                     LinearLayoutManager(this@VideoAllActivity, LinearLayoutManager.VERTICAL, false)
                 recycleView.adapter = VideoAllAdapter(this@VideoAllActivity, videoList)
-                shimmer_layout.stopShimmer()
-                shimmer_layout.visibility = View.GONE
-                recycleView.visibility = View.VISIBLE
+                hideProgressLayout()
             }
 
         })
@@ -53,13 +51,16 @@ class VideoAllActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+//        showProgressLayout()
         shimmer_layout.startShimmer()
     }
 
     override fun onPause() {
         shimmer_layout.stopShimmer()
+//        hideProgressLayout()
         super.onPause()
     }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
 //        return super.onCreateOptionsMenu(menu)
         menuInflater.inflate(R.menu.menu_signout, menu)
@@ -75,10 +76,26 @@ class VideoAllActivity : AppCompatActivity() {
         return false
     }
 
-    private fun signOut() {
+    override fun signOut() {
         AuthUI.getInstance().signOut(this).addOnCompleteListener {
-            Toast.makeText(this, "Signout Successfull", Toast.LENGTH_SHORT).show()
+            showMessage("SignOut Successful")
             finish()
         }
+    }
+
+    override fun showProgressLayout() {
+        recycleView.visibility = View.GONE
+        shimmer_layout.visibility = View.VISIBLE
+        shimmer_layout.startShimmer()
+    }
+
+    override fun hideProgressLayout() {
+        shimmer_layout.stopShimmer()
+        shimmer_layout.visibility = View.GONE
+        recycleView.visibility = View.VISIBLE
+    }
+
+    override fun showMessage(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }

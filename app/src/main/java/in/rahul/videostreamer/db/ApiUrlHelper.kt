@@ -1,4 +1,4 @@
-package `in`.rahul.videostreamer.utils
+package `in`.rahul.videostreamer.db
 
 class ApiUrlHelper {
     companion object{

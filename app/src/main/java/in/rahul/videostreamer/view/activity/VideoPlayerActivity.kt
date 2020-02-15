@@ -1,8 +1,9 @@
-package `in`.rahul.videostreamer.activity
+package `in`.rahul.videostreamer.view.activity
 
 import `in`.rahul.videostreamer.R
-import `in`.rahul.videostreamer.adapter.VideoRelatedAdapter
+import `in`.rahul.videostreamer.view.adapter.VideoRelatedAdapter
 import `in`.rahul.videostreamer.model.VideoListModel
+import `in`.rahul.videostreamer.presenter.VideoPlayerActivityPresenter
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Build
@@ -24,7 +25,7 @@ import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_video_player.*
 import java.util.ArrayList
 
-class VideoPlayerActivity : AppCompatActivity() {
+class VideoPlayerActivity : AppCompatActivity(), VideoPlayerActivityPresenter {
 
     lateinit var playerView: PlayerView
     private var player: SimpleExoPlayer? = null
@@ -45,47 +46,18 @@ class VideoPlayerActivity : AppCompatActivity() {
 
         playerView = findViewById(R.id.exo_player)
         userUid = FirebaseAuth.getInstance().currentUser?.uid
-        videoTitle = intent.getStringExtra("title")
-        videoDes = intent.getStringExtra("description")
-        videoUrl = intent.getStringExtra("vedioUrl")
-        videoId = intent.getStringExtra("id")
-        nextVideoList = intent.getParcelableArrayListExtra<VideoListModel>("videoList")!!
 
-        val videoRef = FirebaseDatabase.getInstance().getReference("videoData/$userUid/$videoId")
-        videoRef.addValueEventListener(object : ValueEventListener{
-            override fun onCancelled(p0: DatabaseError) {
-
-            }
-
-            override fun onDataChange(data: DataSnapshot) {
-                val stData = "playWhen: ${data.child("playWhenReady").getValue()}, pos: ${data.child("playbackPosition").getValue()}, win: ${data.child("currentWindow").getValue()}"
-                Log.e("vid play data", stData)
-                val videoPlayReady = "${data.child("playWhenReady").getValue()}"
-                val videoPosition = "${data.child("playbackPosition").getValue()}"
-                val videoWindow = "${data.child("currentWindow").getValue()}"
-                if (!videoPlayReady.equals("null")){
-                    playWhenReady = videoPlayReady.toBoolean()
-                }
-                if (!videoPosition.equals("null")){
-                    playbackPosition = videoPosition.toLong()
-                }
-                if (!videoWindow.equals("null")){
-                    currentWindow = videoWindow.toInt()
-                }
-                initializePlayer()
-            }
-
-        })
+        fetchingReceivedData()
+        loadVideoData()
 
         tv_title.text = videoTitle
         tv_description.text = videoDes
-
         recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         recycleView.adapter = VideoRelatedAdapter(this, nextVideoList)
 
     }
 
-    private fun initializePlayer() {
+    override fun initializePlayer() {
         player = ExoPlayerFactory.newSimpleInstance(this)
         playerView.player = player
 
@@ -97,7 +69,46 @@ class VideoPlayerActivity : AppCompatActivity() {
         player?.prepare(mediaSource, false, false)
     }
 
-    private fun buildMediaSource(uri: Uri): MediaSource {
+    override fun loadVideoData() {
+        val videoRef = FirebaseDatabase.getInstance().getReference("videoData/$userUid/$videoId")
+
+        videoRef.addValueEventListener(object : ValueEventListener {
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+            override fun onDataChange(data: DataSnapshot) {
+                val stData =
+                    "playWhen: ${data.child("playWhenReady").getValue()}, pos: ${data.child("playbackPosition").getValue()}, win: ${data.child(
+                        "currentWindow"
+                    ).getValue()}"
+                Log.e("vid play data", stData)
+                val videoPlayReady = "${data.child("playWhenReady").getValue()}"
+                val videoPosition = "${data.child("playbackPosition").getValue()}"
+                val videoWindow = "${data.child("currentWindow").getValue()}"
+                if (!videoPlayReady.equals("null")) {
+                    playWhenReady = videoPlayReady.toBoolean()
+                }
+                if (!videoPosition.equals("null")) {
+                    playbackPosition = videoPosition.toLong()
+                }
+                if (!videoWindow.equals("null")) {
+                    currentWindow = videoWindow.toInt()
+                }
+                initializePlayer()
+            }
+        })
+    }
+
+    override fun fetchingReceivedData() {
+        videoTitle = intent.getStringExtra("title")
+        videoDes = intent.getStringExtra("description")
+        videoUrl = intent.getStringExtra("vedioUrl")
+        videoId = intent.getStringExtra("id")
+        nextVideoList = intent.getParcelableArrayListExtra<VideoListModel>("videoList")!!
+    }
+
+    override fun buildMediaSource(uri: Uri): MediaSource {
         val dataSourceFactory: DataSource.Factory =
             DefaultDataSourceFactory(this, "exoplayer-codelab")
 //        return ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(uri)
@@ -148,7 +159,7 @@ class VideoPlayerActivity : AppCompatActivity() {
         }
     }
 
-    private fun releasePlayer() {
+    override fun releasePlayer() {
 
         if (player != null) {
             playWhenReady = player!!.playWhenReady
@@ -177,7 +188,7 @@ class VideoPlayerActivity : AppCompatActivity() {
     }
 
     @SuppressLint("InlinedApi")
-    private fun hideSystemUi() {
+    override fun hideSystemUi() {
         playerView.systemUiVisibility =
             (View.SYSTEM_UI_FLAG_LOW_PROFILE or View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
     }

@@ -52,24 +52,22 @@ class VideoPlayerActivity : AppCompatActivity() {
         nextVideoList = intent.getParcelableArrayListExtra<VideoListModel>("videoList")!!
 
         val videoRef = FirebaseDatabase.getInstance().getReference("videoData/$userUid/$videoId")
-        videoRef.addValueEventListener(object : ValueEventListener{
+        videoRef.addValueEventListener(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
 
             }
 
             override fun onDataChange(data: DataSnapshot) {
-                val stData = "playWhen: ${data.child("playWhenReady").getValue()}, pos: ${data.child("playbackPosition").getValue()}, win: ${data.child("currentWindow").getValue()}"
-                Log.e("vid play data", stData)
                 val videoPlayReady = "${data.child("playWhenReady").getValue()}"
                 val videoPosition = "${data.child("playbackPosition").getValue()}"
                 val videoWindow = "${data.child("currentWindow").getValue()}"
-                if (!videoPlayReady.equals("null")){
+                if (!videoPlayReady.equals("null")) {
                     playWhenReady = videoPlayReady.toBoolean()
                 }
-                if (!videoPosition.equals("null")){
+                if (!videoPosition.equals("null")) {
                     playbackPosition = videoPosition.toLong()
                 }
-                if (!videoWindow.equals("null")){
+                if (!videoWindow.equals("null")) {
                     currentWindow = videoWindow.toInt()
                 }
                 initializePlayer()
@@ -110,7 +108,6 @@ class VideoPlayerActivity : AppCompatActivity() {
 
         if (nextVideoList != null) {
             for (i in nextVideoList.indices) {
-                Log.e("vp Act", ": ${nextVideoList.get(i).url}")
                 val uriList = Uri.parse(nextVideoList.get(i).url)
                 val mediaSource = mediaSourceFactory.createMediaSource(uriList)
                 concatenatingMediaSource.addMediaSource(mediaSource)
@@ -155,11 +152,6 @@ class VideoPlayerActivity : AppCompatActivity() {
             playbackPosition = player!!.currentPosition
             currentWindow = player!!.currentWindowIndex
 
-            val stLog =
-                "playready:${player!!.playWhenReady}, currentwind:${player!!.currentWindowIndex}, playPos:${player!!.currentPosition}"
-
-            Log.e("ExoAct2", stLog)
-
 //            DatabaseReference checkOnline = FirebaseDatabase.getInstance().getReference("status");
             val videoDataReference = FirebaseDatabase.getInstance().getReference("videoData")
 
@@ -180,5 +172,10 @@ class VideoPlayerActivity : AppCompatActivity() {
     private fun hideSystemUi() {
         playerView.systemUiVisibility =
             (View.SYSTEM_UI_FLAG_LOW_PROFILE or View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
+    }
+
+    override fun onBackPressed() {
+        finish()
+        super.onBackPressed()
     }
 }

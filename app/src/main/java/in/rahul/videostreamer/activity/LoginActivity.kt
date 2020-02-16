@@ -1,6 +1,9 @@
 package `in`.rahul.videostreamer.activity
 
 import `in`.rahul.videostreamer.R
+import `in`.rahul.videostreamer.utils.CommonUtil
+import `in`.rahul.videostreamer.utils.CommonUtil.internetDialog
+import `in`.rahul.videostreamer.utils.CommonUtil.isOnline
 import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -24,6 +27,10 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_login)
 
         auth = FirebaseAuth.getInstance()
+
+        if (!isOnline(this)) {
+            internetDialog(this)
+        }
         // Choose authentication providers
         val googleProvider = arrayListOf(AuthUI.IdpConfig.GoogleBuilder().build())
 
@@ -34,15 +41,7 @@ class LoginActivity : AppCompatActivity() {
                     googleProvider
                 ).build(), RC_SIGN_IN
             )
-//            startActivity(Intent(this, VideoAllActivity::class.java))
         }
-
-//        btn_login.setOnClickListener {
-//            AuthUI.getInstance().signOut(this).addOnCompleteListener {
-//                Toast.makeText(this, "Sign Out", Toast.LENGTH_SHORT).show()
-////                startActivity(Intent(this, MainActivity::class.java))
-//            }
-//        }
 
     }
 
@@ -53,13 +52,12 @@ class LoginActivity : AppCompatActivity() {
             if (data != null) {
                 val response = IdpResponse.fromResultIntent(data)
                 if (resultCode == Activity.RESULT_OK) {
-                    startActivity(Intent(this, VideoAllActivity::class.java))
-                    val user = auth.currentUser
-                    val stLog =
-                        "userName: ${user?.displayName}, email: ${user?.email}, uid: ${user?.uid}, pid: ${user?.providerId}, res: $response"
-                    Log.e("Login Act", stLog)
+                    startActivity(Intent(this, VideoAllActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
+                    CommonUtil.showMessage(this,"SignIn Successful")
+                    finish()
+//                    val user = auth.currentUser
                 } else {
-                    Toast.makeText(this, "Error: $response", Toast.LENGTH_SHORT).show()
+                    CommonUtil.showMessage(this, "Unable to Login\nPlease try After Sometime")
                 }
             }
         }
@@ -68,14 +66,9 @@ class LoginActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         val currentUser = auth.currentUser
-        updateUI(currentUser)
-    }
-
-    private fun updateUI(currentUser: FirebaseUser?) {
-        currentUser.let {
-            val stLog =
-                "userName: ${currentUser?.displayName}, email: ${currentUser?.email}, uid: ${currentUser?.uid}, pid: ${currentUser?.providerId}"
-            Log.e("Login Act Res", stLog)
+        if (currentUser != null){
+            startActivity(Intent(this, VideoAllActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
+            finish()
         }
     }
 
@@ -96,7 +89,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun signOut() {
         AuthUI.getInstance().signOut(this).addOnCompleteListener {
-            Toast.makeText(this, "Signout Successfull", Toast.LENGTH_SHORT).show()
+            CommonUtil.showMessage(this, "SignOut Successful")
             finish()
         }
     }

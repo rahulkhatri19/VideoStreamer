@@ -11,4 +11,6 @@ interface VideoAllActivityPresenter {
     fun signOut()
 
     fun getVideoData()
+
+    fun internetDialog()
 }

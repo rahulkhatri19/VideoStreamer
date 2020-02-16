@@ -2,6 +2,9 @@ package `in`.rahul.videostreamer.view.activity
 
 import `in`.rahul.videostreamer.R
 import `in`.rahul.videostreamer.presenter.LoginActivityPresenter
+import `in`.rahul.videostreamer.util.CommonUtil
+import `in`.rahul.videostreamer.util.CommonUtil.internetDialog
+import `in`.rahul.videostreamer.util.CommonUtil.isOnline
 import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -21,8 +24,11 @@ class LoginActivity : AppCompatActivity(), LoginActivityPresenter {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-
         auth = FirebaseAuth.getInstance()
+
+        if (!isOnline(this)) {
+            internetDialog(this)
+        }
 
         btn_login.setOnClickListener {
             startFirebaseAuth()
@@ -97,6 +103,7 @@ class LoginActivity : AppCompatActivity(), LoginActivityPresenter {
     }
 
     override fun showMessage(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        CommonUtil.showMessage(this, message)
     }
+
 }

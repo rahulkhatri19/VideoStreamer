@@ -5,12 +5,15 @@ import `in`.rahul.videostreamer.view.adapter.VideoAllAdapter
 import `in`.rahul.videostreamer.model.VideoModel
 import `in`.rahul.videostreamer.presenter.VideoAllActivityPresenter
 import `in`.rahul.videostreamer.db.ApiHelperInterface
+import `in`.rahul.videostreamer.util.CommonUtil
+import `in`.rahul.videostreamer.util.CommonUtil.isOnline
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.firebase.ui.auth.AuthUI
 import kotlinx.android.synthetic.main.activity_video_all.*
@@ -23,6 +26,10 @@ class VideoAllActivity : AppCompatActivity(), VideoAllActivityPresenter {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video_all)
+
+        if (!isOnline(this)) {
+            internetDialog()
+        }
 
         showProgressLayout()
         getVideoData()
@@ -96,6 +103,25 @@ class VideoAllActivity : AppCompatActivity(), VideoAllActivityPresenter {
     }
 
     override fun showMessage(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        CommonUtil.showMessage(this, message)
+    }
+    override fun internetDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setMessage("Please Connect to Internet")
+        builder.setCancelable(false).setIcon(R.drawable.ic_internet).setTitle("No Internet Connection")
+        builder.setPositiveButton("OK"
+        ) { dialog, id ->
+            dialog.cancel()
+            finish()
+        }.setNegativeButton("Retry") { dialog, which ->
+            if (!isOnline(this)) {
+                internetDialog()
+            } else {
+                dialog.dismiss()
+                getVideoData()
+            }
+        }
+        val alert = builder.create()
+        alert.show()
     }
 }
